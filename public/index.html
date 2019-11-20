@@ -1,0 +1,113 @@
+<html>
+<head>
+
+<title>巢穴一覧</title>
+<link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
+</head>
+<style type="text/css">
+.floating-div {
+  position: absolute
+  right: 40px
+  top: 40px
+  z-index: 100000
+}
+</style>
+<script type="text/javascript">
+	function loadJSON(path, success, error) {
+	    var xhr = new XMLHttpRequest()
+	    xhr.onreadystatechange = function()
+	    {
+	        if (xhr.readyState === XMLHttpRequest.DONE) {
+	            if (xhr.status === 200) {
+	                if (success)
+	                    success(JSON.parse(xhr.responseText))
+	            } else {
+	                if (error)
+	                    error(xhr)
+	            }
+	        }
+	    }
+	    xhr.open("GET", path, true)
+	    xhr.send()
+	}
+	function gotoWiki(element) {
+		window.open("https://wiki.52poke.com/wiki/" + element.innerHTML)
+	}
+	function showImage(element) {
+		let den = element.parentNode.parentNode.cells[0].innerHTML
+
+		let firstPossible = den.split(',')[0].replace(/\s/g, '').toLowerCase()
+
+		//document.getElementById("floater").src = "res/den2x.jfif"
+		document.getElementById("floater").src = "res/" + firstPossible + ".jfif"
+	}
+</script>
+<script type="text/javascript">
+
+	loadJSON('dex.json',
+        function(data) { 
+			console.log(data)
+			let grouped = data.reduce((result, current) => {
+				(result[current.family[0]] = result[current.family[0]] || []).push(
+		      		current
+		    	)
+		   		return result
+			}, {})
+			console.log(grouped)
+		},
+        function(xhr) { console.error(xhr) }
+	)
+	
+	function showData(){
+
+	    var table  = document.getElementById('tableBody')
+	    var a, tr, td
+	    for(var i = 0; i < data.length; i++){
+	        tr = table.insertRow()
+
+            td = tr.insertCell()
+            td.appendChild(document.createTextNode(data[i].regionDex))
+
+            td = tr.insertCell()
+			a = document.createElement('a')
+			a.innerText = data[i].name
+			a.setAttribute('href',"#")
+			a.setAttribute("onclick", "gotoWiki(this)")
+			td.appendChild(a)
+
+            td = tr.insertCell()
+            td.appendChild(document.createTextNode(data[i].type))
+	    }
+	}
+</script>
+
+<body onload="showData()">
+
+<div class="pure-g">
+<div class="pure-u-1-8">
+</div>
+<div class="pure-u-7-8">
+<h2>巢穴一覧</h2>
+</div>
+</div>
+
+<div class="pure-g">
+<div class="pure-u-1-24">
+</div>
+
+<div class="pure-u-11-24">
+<table class="pure-table pure-table-bordered">
+<thead><tr>
+<td>No.</td>
+<td>宝可梦</td>
+<td>属性</td>
+</tr></thead>
+
+<tbody id="tableBody">
+</tbody>
+
+</table>
+</div></div>
+
+</body>
+</html>

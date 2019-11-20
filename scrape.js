@@ -35,8 +35,9 @@ axios.get(galardexUrl)
 					.then((response) => {
 						if(response.status === 200) {
 							$ = cheerio.load(response.data)
-							$('table.a-c.at-c.roundy tbody tr td table.roundy.at-c.a-c tbody tr td.textblack span').remove()
-							let evolveLineTable = $('table.a-c.at-c.roundy tbody tr td table.roundy.at-c.a-c tbody tr td.textblack')
+							$('table.roundy tbody tr td table.roundy.at-c.a-c tbody tr td.textblack span').remove()
+							let evolveLineTable = $('table.roundy tbody tr td table.roundy.at-c.a-c tbody tr td.textblack')
+							//fs.writeFileSync("debug.html", evolveLineTable)
 							item.family = evolveLineTable.text().trim().replace(new RegExp(galarForm,'g'), '[g]').replace(new RegExp(alolaForm,'g'), '[a]').split(/\s+/)
 						}
 
@@ -48,7 +49,7 @@ axios.get(galardexUrl)
 			.then(() => {
 				Promise.all(promises)
 					.then(() => {
-						fs.writeFileSync("dex.json",JSON.stringify(out, null, 2))
+						fs.writeFileSync("dex.json", JSON.stringify(out, null, 2))
 					})
 			})
 			//fs.writeFileSync("dexShort.json",JSON.stringify(out, null, 2))
