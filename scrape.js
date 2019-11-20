@@ -3,6 +3,8 @@ let cheerio = require('cheerio')
 let fs = require('fs')
 
 let galardexUrl = 'https://wiki.52poke.com/zh-hans/%E5%AE%9D%E5%8F%AF%E6%A2%A6%E5%88%97%E8%A1%A8%EF%BC%88%E6%8C%89%E4%BC%BD%E5%8B%92%E5%B0%94%E5%9B%BE%E9%89%B4%E7%BC%96%E5%8F%B7%EF%BC%89'
+let emptyType = '[[（属性）|]]'
+let galaForm = '伽勒尔的样子'
 
 axios.get(galardexUrl)
 	.then((response) => {
@@ -16,8 +18,8 @@ axios.get(galardexUrl)
 			var regionHeader, nationHeader, nameHeader, typeHeader
 
 			dexTable.each(function(i, elem) {
-		 		let text = $(this).text().trim().replace('[[（属性）|]]', '').split(/\s+/)
-				if (i == 0) {
+		 		let text = $(this).text().trim().replace(galaForm, '[g]').split(/\s+/)
+				if (i == 0) { //header
 					regionHeader = text[0]
 					nationHeader = text[1]
 					nameHeader = text[2]
@@ -27,7 +29,7 @@ axios.get(galardexUrl)
 						[regionHeader] : text[0],
 						[nationHeader] : text[1],
 						[nameHeader] : text[2],
-						[typeHeader] : text[4] == '' ? [text[3]] : [text[3], text[4]]
+						[typeHeader] : text[4] == emptyType ? [text[3]] : [text[3], text[4]]
 					})
 				}
 			})
