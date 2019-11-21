@@ -1,0 +1,135 @@
+<html>
+<head>
+
+<title>巢穴一覧</title>
+<link rel='stylesheet' href='https://unpkg.com/purecss@1.0.1/build/pure-min.css' integrity='sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47' crossorigin='anonymous'>
+</head>
+<style type='text/css'>
+.floating-div {
+  position: absolute
+  right: 40px
+  top: 40px
+  z-index: 100000
+}
+.group-last { border-bottom: 1px solid black }
+a { text-decoration: none }
+</style>
+<script type='text/javascript'>
+	function sorter(a, b) {
+		let left = parseInt(a[0].regionDex.replace(/\D/g,''))
+		let right = parseInt(b[0].regionDex.replace(/\D/g,''))
+	    if (left === right) {
+	        return 0;
+	    }
+	    else {
+	        return (left < right) ? -1 : 1;
+	    }
+	}
+	function loadJSON(path, success, error) {
+	    var xhr = new XMLHttpRequest()
+	    xhr.onreadystatechange = function()
+	    {
+	        if (xhr.readyState === XMLHttpRequest.DONE) {
+	            if (xhr.status === 200) {
+	                if (success)
+	                    success(JSON.parse(xhr.responseText))
+	            } else {
+	                if (error)
+	                    error(xhr)
+	            }
+	        }
+	    }
+	    xhr.open('GET', path, true)
+	    xhr.send()
+	}
+	function gotoWiki(element) {
+		window.open('https://wiki.52poke.com/wiki/' + element.innerHTML.split('[')[0])
+	}
+	function showImage(element) {
+		let den = element.parentNode.parentNode.cells[0].innerHTML
+
+		let firstPossible = den.split(',')[0].replace(/\s/g, '').toLowerCase()
+
+		//document.getElementById('floater').src = 'res/den2x.jfif'
+		document.getElementById('floater').src = 'res/' + firstPossible + '.jfif'
+	}
+</script>
+<script type='text/javascript'>
+	function showData(){
+		loadJSON('dex.json',
+	        function(json) {
+				let grouped = json.reduce((result, current) => {
+					let family = current.family[0]
+					current.family = undefined
+					if (!result[family]) result[family] = []
+					result[family].push(current)
+			   		return result
+				}, {})
+				let groupedArr = Object.keys(grouped).map(i => grouped[i])
+				let data = groupedArr.sort(sorter)
+
+			    var table  = document.getElementById('tableBody')
+			    var a, tr, td
+			    data.forEach(function(group) {
+			    	group.forEach(function(item) {
+				        tr = table.insertRow()
+
+			            td = tr.insertCell()
+			            td.appendChild(document.createTextNode(item.regionDex))
+
+			            td = tr.insertCell()
+						a = document.createElement('a')
+						a.innerText = item.name
+						a.setAttribute('href','javascript:void()')
+						a.setAttribute('onclick', 'gotoWiki(this)')
+						td.appendChild(a)
+
+			            td = tr.insertCell()
+			            td.appendChild(document.createTextNode(item.type))
+
+			            td = tr.insertCell()
+			            td.appendChild(document.createTextNode(item.nature))
+
+			            td = tr.insertCell()
+			            td.appendChild(document.createTextNode(item.hiddenNature))
+		            })
+		            tr.classList.add('group-last')
+			    })
+			},
+	        function(xhr) { console.error(xhr) }
+		)
+	}
+</script>
+
+<body onload='showData()'>
+
+<div class='pure-g'>
+<div class='pure-u-3-8'>
+</div>
+<div class='pure-u-5-8'>
+<h2>加勒尔图鉴</h2>
+</div>
+</div>
+
+<div class='pure-g'>
+<div class='pure-u-6-24'>
+</div>
+
+<div class='pure-u-12-24'>
+<table class='pure-table'>
+<thead><tr>
+<td>No.</td>
+<td>宝可梦</td>
+<td>属性</td>
+<td>特性</td>
+<td>隐藏特性</td>
+</tr></thead>
+
+<tbody id='tableBody'>
+</tbody>
+
+</table>
+</div></div>
+
+</body>
+</html>
