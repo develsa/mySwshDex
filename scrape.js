@@ -9,6 +9,7 @@ let emptyType = '[[（属性）|]]'
 let galarForm = '伽勒尔的样子'
 let alolaForm = '阿罗拉的样子'
 let galar = '伽勒尔'
+let hidden = '隐藏特性'
 
 axios.get(galardexUrl)
 	.then((response) => {
@@ -25,7 +26,9 @@ axios.get(galardexUrl)
 					nationDex : text[1],
 					name : text[2],
 					type : text[4] == emptyType ? [text[3]] : [text[3], text[4]],
-					family : []
+					family : [],
+					nature : '',
+					hiddenNature : ''
 				})
 			})
 
@@ -37,8 +40,13 @@ axios.get(galardexUrl)
 							$ = cheerio.load(response.data)
 							$('table.roundy tbody tr td table.roundy.at-c.a-c tbody tr td.textblack span').remove()
 							let evolveLineTable = $('table.roundy tbody tr td table.roundy.at-c.a-c tbody tr td.textblack')
-							//fs.writeFileSync("debug.html", evolveLineTable)
 							item.family = evolveLineTable.text().trim().replace(new RegExp(galarForm,'g'), '[g]').replace(new RegExp(alolaForm,'g'), '[a]').split(/\s+/)
+
+							let natureTable = $('table.roundy tbody tr td table.textblack.bw-1.fulltable tbody tr td table tbody tr')
+							let nature = natureTable.text().trim().split(/\n+/)[0]
+							let hiddenNature = natureTable.text().trim().split(/\n+/)[1]
+							item.nature = nature.replace(/\s/g, '').replace('或', ' / ')
+							item.hiddenNature = isNaN(hiddenNature.replace(/,/g, '')) ? hiddenNature.replace(hidden, '').replace(/\s/g, '') : ''
 						}
 
 					}, (error) => {
